@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { itemCount } = useCart();
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
 
   // Change navbar style on scroll
@@ -86,7 +86,7 @@ const Navbar: React.FC = () => {
             <Search className="h-5 w-5" />
           </Button>
 
-          {isAuthenticated ? (
+          {user ? (
             <>
               <Link to="/account/wishlist">
                 <Button 
@@ -97,7 +97,7 @@ const Navbar: React.FC = () => {
                   <Heart className="h-5 w-5" />
                 </Button>
               </Link>
-              <Link to="/account">
+              <Link to="/profile">
                 <Button 
                   variant="ghost" 
                   size="icon"
@@ -108,7 +108,7 @@ const Navbar: React.FC = () => {
               </Link>
             </>
           ) : (
-            <Link to="/account/login">
+            <Link to="/auth">
               <Button variant="outline" size="sm">
                 Sign in
               </Button>
@@ -171,11 +171,11 @@ const Navbar: React.FC = () => {
             ))}
             
             <Link
-              to="/account"
+              to={user ? "/profile" : "/auth"}
               className="py-2 text-xl font-medium border-b border-border"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {isAuthenticated ? 'My Account' : 'Sign In'}
+              {user ? 'My Account' : 'Sign In'}
             </Link>
             
             <div className="pt-4 flex items-center justify-center">
