@@ -40,7 +40,7 @@ export const products: Product[] = [
   {
     id: '4',
     title: 'Ocean Adventures Poster',
-    description: 'A vibrant poster featuring beautiful underwater scenes. Perfect for a child's bedroom or playroom.',
+    description: 'A vibrant poster featuring beautiful underwater scenes. Perfect for a child\'s bedroom or playroom.',
     price: 14.99,
     category: 'poster',
     ageGroups: ['preschool', 'elementary', 'middle'],
