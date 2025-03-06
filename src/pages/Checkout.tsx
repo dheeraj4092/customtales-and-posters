@@ -9,12 +9,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Icons } from '@/components/Icons';
+import { getProductById } from '@/utils/data';
 
 const Checkout: React.FC = () => {
   const { items, clearCart, totalPrice } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Map cart items to include product details
+  const cartItemsWithDetails = items.map(item => {
+    const product = getProductById(item.productId);
+    return {
+      id: item.productId,
+      quantity: item.quantity,
+      name: product?.title || 'Unknown Product',
+      price: product?.price || 0,
+      image: product?.images[0] || '/placeholder.svg',
+      category: product?.category || 'unknown'
+    };
+  });
   
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
@@ -92,11 +106,11 @@ const Checkout: React.FC = () => {
             <CardHeader>
               <CardTitle>Order Summary</CardTitle>
               <CardDescription>
-                {items.length} {items.length === 1 ? 'item' : 'items'} in your cart
+                {cartItemsWithDetails.length} {cartItemsWithDetails.length === 1 ? 'item' : 'items'} in your cart
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {items.map((item) => (
+              {cartItemsWithDetails.map((item) => (
                 <div key={item.id} className="flex justify-between">
                   <div>
                     <p className="font-medium">{item.name}</p>

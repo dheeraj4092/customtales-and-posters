@@ -6,12 +6,26 @@ import { useCart } from '@/context/CartContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { getProductById } from '@/utils/data';
 
 const Cart: React.FC = () => {
   const { items, updateItemQuantity, removeItem, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
   
-  if (items.length === 0) {
+  // Map cart items to include product details
+  const cartItemsWithDetails = items.map(item => {
+    const product = getProductById(item.productId);
+    return {
+      id: item.productId,
+      quantity: item.quantity,
+      name: product?.title || 'Unknown Product',
+      price: product?.price || 0,
+      image: product?.images[0] || '/placeholder.svg',
+      category: product?.category || 'unknown'
+    };
+  });
+  
+  if (cartItemsWithDetails.length === 0) {
     return (
       <div className="container py-20 text-center">
         <div className="max-w-md mx-auto">
@@ -34,14 +48,14 @@ const Cart: React.FC = () => {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Cart Items ({items.length})</CardTitle>
+              <CardTitle>Cart Items ({cartItemsWithDetails.length})</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {items.map((item) => (
+              {cartItemsWithDetails.map((item) => (
                 <div key={item.id} className="flex gap-4 py-3">
                   <div className="w-20 h-20 bg-muted rounded overflow-hidden shrink-0">
                     <img 
-                      src={item.image || '/placeholder.svg'} 
+                      src={item.image} 
                       alt={item.name} 
                       className="w-full h-full object-cover"
                     />

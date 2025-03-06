@@ -33,7 +33,14 @@ const FeaturedProducts: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {featuredProducts.map((product) => (
             <div key={product.id} className="animate-fade-up">
-              <ProductCard product={product} featured />
+              <ProductCard 
+                id={product.id}
+                name={product.title}
+                price={product.price}
+                image={product.images[0]}
+                category={product.category}
+                featured={true}
+              />
             </div>
           ))}
         </div>

@@ -9,9 +9,11 @@ interface CartContextType {
   addItem: (productId: string, quantity?: number) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
+  updateItemQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   itemCount: number;
   total: number;
+  totalPrice: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -93,6 +95,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  // Adding the alias for updateQuantity to fix the error
+  const updateItemQuantity = updateQuantity;
+
   const clearCart = () => {
     setItems([]);
   };
@@ -102,10 +107,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       items, 
       addItem, 
       removeItem, 
-      updateQuantity, 
+      updateQuantity,
+      updateItemQuantity, 
       clearCart,
       itemCount,
-      total
+      total,
+      totalPrice: total
     }}>
       {children}
     </CartContext.Provider>
