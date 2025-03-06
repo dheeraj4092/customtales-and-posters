@@ -1,4 +1,3 @@
-
 export type ProductCategory = 'book' | 'poster' | 'custom';
 export type AgeGroup = 'toddler' | 'preschool' | 'elementary' | 'middle' | 'teen' | 'adult';
 
@@ -8,11 +7,13 @@ export interface Product {
   description: string;
   price: number;
   category: ProductCategory;
-  ageGroups: AgeGroup[];
+  age_groups: AgeGroup[];
   images: string[];
   featured?: boolean;
   tags?: string[];
   stock?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface CartItem {

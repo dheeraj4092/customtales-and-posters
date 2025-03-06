@@ -8,7 +8,7 @@ export interface ProductFormData {
   description: string;
   price: number;
   category: ProductCategory;
-  ageGroups: AgeGroup[];
+  age_groups: AgeGroup[]; // Changed from ageGroups to age_groups
   images: string[];
   featured: boolean;
   tags: string[];

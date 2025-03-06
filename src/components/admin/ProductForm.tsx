@@ -43,7 +43,7 @@ const formSchema = z.object({
   description: z.string().min(10, { message: 'Description must be at least 10 characters' }),
   price: z.coerce.number().positive({ message: 'Price must be a positive number' }),
   category: z.enum(['book', 'poster', 'custom'] as const),
-  ageGroups: z.array(z.enum(['toddler', 'preschool', 'elementary', 'middle', 'teen', 'adult'] as const))
+  age_groups: z.array(z.enum(['toddler', 'preschool', 'elementary', 'middle', 'teen', 'adult'] as const))
     .min(1, { message: 'Select at least one age group' }),
   featured: z.boolean().default(false),
   stock: z.coerce.number().int().nonnegative({ message: 'Stock must be a non-negative integer' }),
@@ -80,7 +80,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       description: '',
       price: 0,
       category: 'book' as ProductCategory,
-      ageGroups: [],
+      age_groups: [],
       featured: false,
       stock: 0,
       tags: '',
@@ -96,7 +96,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         description: existingProduct.description,
         price: existingProduct.price,
         category: existingProduct.category,
-        ageGroups: existingProduct.ageGroups,
+        age_groups: existingProduct.age_groups,
         featured: existingProduct.featured || false,
         stock: existingProduct.stock || 0,
         tags: existingProduct.tags?.join(', ') || '',
@@ -109,10 +109,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
     if (productId) {
       updateProduct({ 
         id: productId, 
-        product: data
+        product: data as any
       });
     } else {
-      createProduct(data);
+      createProduct(data as any);
     }
     onSuccess();
   };
@@ -256,7 +256,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             
             <FormField
               control={form.control}
-              name="ageGroups"
+              name="age_groups"
               render={() => (
                 <FormItem>
                   <div className="mb-4">
@@ -270,7 +270,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       <FormField
                         key={ageGroup.id}
                         control={form.control}
-                        name="ageGroups"
+                        name="age_groups"
                         render={({ field }) => {
                           return (
                             <FormItem
