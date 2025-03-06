@@ -1,18 +1,28 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Product } from '@/types';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
 import { ShoppingCart, Heart } from 'lucide-react';
 
 interface ProductCardProps {
-  product: Product;
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  category: string;
   featured?: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, featured = false }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ 
+  id, 
+  name, 
+  price, 
+  image, 
+  category, 
+  featured = false 
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const { addItem } = useCart();
@@ -20,12 +30,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, featured = false }) 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product.id);
+    addItem(id);
   };
 
   return (
     <Link 
-      to={`/product/${product.id}`}
+      to={`/product/${id}`}
       className={cn(
         'group block relative rounded-2xl overflow-hidden bg-white card-hover',
         featured ? 'aspect-[4/5]' : 'aspect-[3/4]'
@@ -39,8 +49,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, featured = false }) 
         !imageLoaded && 'image-loading'
       )}>
         <img
-          src={product.images[0]}
-          alt={product.title}
+          src={image}
+          alt={name}
           className={cn(
             'w-full h-full object-cover transition-transform duration-500 ease-out-expo',
             isHovered && 'scale-105',
@@ -73,8 +83,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, featured = false }) 
         <div className="space-y-2">
           <div className="flex justify-between items-end">
             <div>
-              <h3 className="text-white font-medium line-clamp-2">{product.title}</h3>
-              <p className="text-white/80 text-sm mt-1">${product.price.toFixed(2)}</p>
+              <h3 className="text-white font-medium line-clamp-2">{name}</h3>
+              <p className="text-white/80 text-sm mt-1">${price.toFixed(2)}</p>
             </div>
             
             <Button
@@ -92,8 +102,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, featured = false }) 
       {/* Category label */}
       <div className="absolute top-4 left-4">
         <span className="text-xs font-medium px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm">
-          {product.category === 'book' ? 'Book' : 
-           product.category === 'poster' ? 'Poster' : 'Custom'}
+          {category === 'book' ? 'Book' : 
+           category === 'poster' ? 'Poster' : 'Custom'}
         </span>
       </div>
     </Link>
