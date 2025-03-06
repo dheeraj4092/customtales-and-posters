@@ -4,10 +4,28 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ProductCard from './ProductCard';
-import { getFeaturedProducts } from '@/utils/data';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Product } from '@/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const FeaturedProducts: React.FC = () => {
-  const featuredProducts = getFeaturedProducts();
+  const { data: featuredProducts, isLoading } = useQuery({
+    queryKey: ['featuredProducts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('featured', true);
+        
+      if (error) {
+        console.error('Error fetching featured products:', error);
+        throw error;
+      }
+      
+      return data as Product[];
+    }
+  });
 
   return (
     <section className="py-20 bg-secondary/50">
@@ -30,20 +48,34 @@ const FeaturedProducts: React.FC = () => {
           </Link>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-          {featuredProducts.map((product) => (
-            <div key={product.id} className="animate-fade-up">
-              <ProductCard 
-                id={product.id}
-                name={product.title}
-                price={product.price}
-                image={product.images[0]}
-                category={product.category}
-                featured={true}
-              />
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            {Array(4).fill(0).map((_, index) => (
+              <div key={index} className="animate-pulse">
+                <Skeleton className="aspect-[4/5] w-full rounded-xl" />
+                <div className="mt-4 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            {featuredProducts?.map((product) => (
+              <div key={product.id} className="animate-fade-up">
+                <ProductCard 
+                  id={product.id}
+                  name={product.title}
+                  price={product.price}
+                  image={product.images[0]}
+                  category={product.category}
+                  featured={true}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

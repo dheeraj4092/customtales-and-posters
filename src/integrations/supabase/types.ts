@@ -9,6 +9,51 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      products: {
+        Row: {
+          age_groups: string[]
+          category: string
+          created_at: string | null
+          description: string
+          featured: boolean | null
+          id: string
+          images: string[]
+          price: number
+          stock: number | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          age_groups: string[]
+          category: string
+          created_at?: string | null
+          description: string
+          featured?: boolean | null
+          id?: string
+          images: string[]
+          price: number
+          stock?: number | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          age_groups?: string[]
+          category?: string
+          created_at?: string | null
+          description?: string
+          featured?: boolean | null
+          id?: string
+          images?: string[]
+          price?: number
+          stock?: number | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -41,7 +86,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

@@ -1,42 +1,60 @@
 
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-
-interface NavLink {
-  name: string;
-  path: string;
-}
+import { useAuth } from '@/context/AuthContext';
+import { isCurrentUserAdmin } from '@/utils/auth';
 
 interface NavLinksProps {
-  links: NavLink[];
+  links: { name: string; path: string }[];
   className?: string;
   onClick?: () => void;
 }
 
 const NavLinks: React.FC<NavLinksProps> = ({ 
   links, 
-  className = '', 
+  className, 
   onClick 
 }) => {
-  const location = useLocation();
+  const { user } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+  
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (user) {
+        const adminStatus = await isCurrentUserAdmin();
+        setIsAdmin(adminStatus);
+      } else {
+        setIsAdmin(false);
+      }
+    };
+    
+    checkAdmin();
+  }, [user]);
+  
+  // Combine standard links with admin link if user is admin
+  const allLinks = isAdmin
+    ? [...links, { name: 'Admin', path: '/admin' }]
+    : links;
   
   return (
-    <div className={className}>
-      {links.map((link) => (
-        <Link
+    <nav className={className}>
+      {allLinks.map((link) => (
+        <NavLink
           key={link.path}
           to={link.path}
-          className={cn(
-            'font-medium transition-colors hover:text-primary',
-            location.pathname === link.path ? 'text-primary' : 'text-foreground'
-          )}
+          className={({ isActive }) =>
+            cn(
+              'block py-2 px-2 transition-colors hover:text-primary',
+              isActive ? 'font-medium text-primary' : 'text-muted-foreground',
+            )
+          }
           onClick={onClick}
         >
           {link.name}
-        </Link>
+        </NavLink>
       ))}
-    </div>
+    </nav>
   );
 };
 
