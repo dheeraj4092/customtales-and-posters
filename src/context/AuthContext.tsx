@@ -35,6 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Set up the auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.id);
       setSession(session);
       setUser(session?.user || null);
       
@@ -50,6 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Get the initial session
     const initializeAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      console.log('Initial session:', session?.user?.id);
       
       setSession(session);
       setUser(session?.user || null);
@@ -89,10 +91,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('Signing in with:', email);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
         toast.error(error.message);
+        console.error('Sign in error:', error);
         return;
       }
       
@@ -106,6 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
+      console.log('Signing up with:', email, fullName);
       const { error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -118,6 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) {
         toast.error(error.message);
+        console.error('Sign up error:', error);
         return;
       }
       
