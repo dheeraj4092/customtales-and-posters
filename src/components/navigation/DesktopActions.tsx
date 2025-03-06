@@ -11,17 +11,19 @@ const DesktopActions: React.FC = () => {
   
   return (
     <div className="hidden md:flex items-center space-x-4">
-      <Button 
-        variant="ghost" 
-        size="icon"
-        aria-label="Search"
-      >
-        <Search className="h-5 w-5" />
-      </Button>
+      <Link to="/search">
+        <Button 
+          variant="ghost" 
+          size="icon"
+          aria-label="Search"
+        >
+          <Search className="h-5 w-5" />
+        </Button>
+      </Link>
 
       {user ? (
         <>
-          <Link to="/account/wishlist">
+          <Link to="/wishlist">
             <Button 
               variant="ghost" 
               size="icon"

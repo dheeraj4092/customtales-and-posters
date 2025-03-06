@@ -33,8 +33,8 @@ const Navbar: React.FC = () => {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Books', path: '/products?category=book' },
-    { name: 'Posters', path: '/products?category=poster' },
+    { name: 'Books', path: '/books' },
+    { name: 'Posters', path: '/posters' },
     { name: 'Custom Orders', path: '/custom-order' },
   ];
 
