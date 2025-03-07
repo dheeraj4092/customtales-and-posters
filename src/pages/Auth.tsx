@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth/useAuth';
 import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -23,10 +22,45 @@ const Auth: React.FC = () => {
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupName, setSignupName] = useState('');
+  
+  // Force re-render to prevent infinite loading
+  const [authChecked, setAuthChecked] = useState(false);
+  
+  useEffect(() => {
+    // Set a timeout to ensure we don't get stuck in loading state
+    const timer = setTimeout(() => {
+      setAuthChecked(true);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // If user is logged in, redirect to home
   if (!isLoading && user) {
     return <Navigate to="/" replace />;
+  }
+
+  // Show loading skeleton while authentication state is being determined
+  // Only show for a short period before considering auth checked
+  if (isLoading && !authChecked) {
+    return (
+      <div className="container flex items-center justify-center min-h-[calc(100vh-200px)] py-12">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <Skeleton className="h-8 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-full" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </CardContent>
+          <CardFooter>
+            <Skeleton className="h-10 w-full" />
+          </CardFooter>
+        </Card>
+      </div>
+    );
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -50,28 +84,6 @@ const Auth: React.FC = () => {
       setIsSubmitting(false);
     }
   };
-
-  // Show loading skeleton while authentication state is being determined
-  if (isLoading) {
-    return (
-      <div className="container flex items-center justify-center min-h-[calc(100vh-200px)] py-12">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <Skeleton className="h-8 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-full" />
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </CardContent>
-          <CardFooter>
-            <Skeleton className="h-10 w-full" />
-          </CardFooter>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="container flex items-center justify-center min-h-[calc(100vh-200px)] py-12">

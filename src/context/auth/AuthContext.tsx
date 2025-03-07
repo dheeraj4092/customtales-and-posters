@@ -55,6 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (error) {
         console.error('Error initializing auth:', error);
       } finally {
+        // Always set loading to false after initialization, regardless of outcome
         setIsLoading(false);
       }
     };
