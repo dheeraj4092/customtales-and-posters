@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/auth/useAuth';
 import { cn } from '@/lib/utils';
 import NavLinks from './NavLinks';
 
