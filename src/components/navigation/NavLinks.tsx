@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/auth/useAuth';
 import { isCurrentUserAdmin } from '@/utils/auth';
 
 interface NavLinksProps {

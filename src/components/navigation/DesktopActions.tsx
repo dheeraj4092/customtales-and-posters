@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Heart, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/auth/useAuth';
 import CartButton from './CartButton';
 
 const DesktopActions: React.FC = () => {

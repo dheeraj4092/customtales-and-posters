@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/auth/useAuth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/Icons';
