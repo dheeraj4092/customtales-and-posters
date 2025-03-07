@@ -6,6 +6,7 @@ import NavLinks from './navigation/NavLinks';
 import DesktopActions from './navigation/DesktopActions';
 import MobileActions from './navigation/MobileActions';
 import MobileMenu from './navigation/MobileMenu';
+import { ThemeToggle } from './ThemeToggle';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -44,7 +45,9 @@ const Navbar: React.FC = () => {
     <header 
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out-expo',
-        isScrolled ? 'bg-white/90 backdrop-blur-md shadow-subtle py-2' : 'bg-transparent py-4'
+        isScrolled 
+          ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-subtle py-2' 
+          : 'bg-transparent py-4'
       )}
     >
       <nav className="container-tight flex items-center justify-between">
@@ -59,14 +62,20 @@ const Navbar: React.FC = () => {
           className="hidden md:flex items-center space-x-8" 
         />
 
-        {/* Desktop Action Items */}
-        <DesktopActions />
+        {/* Desktop Action Items with Theme Toggle */}
+        <div className="hidden md:flex items-center space-x-2">
+          <ThemeToggle />
+          <DesktopActions />
+        </div>
 
         {/* Mobile Menu Button */}
-        <MobileActions 
-          mobileMenuOpen={mobileMenuOpen} 
-          toggleMobileMenu={toggleMobileMenu} 
-        />
+        <div className="flex md:hidden items-center space-x-2">
+          <ThemeToggle />
+          <MobileActions 
+            mobileMenuOpen={mobileMenuOpen} 
+            toggleMobileMenu={toggleMobileMenu} 
+          />
+        </div>
       </nav>
 
       {/* Mobile Menu */}

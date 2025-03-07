@@ -50,17 +50,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Get the initial session
     const initializeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('Initial session:', session?.user?.id);
-      
-      setSession(session);
-      setUser(session?.user || null);
-      
-      if (session?.user) {
-        await fetchProfile(session.user.id);
+      try {
+        setIsLoading(true);
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Initial session:', session?.user?.id);
+        
+        setSession(session);
+        setUser(session?.user || null);
+        
+        if (session?.user) {
+          await fetchProfile(session.user.id);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
 
     initializeAuth();
