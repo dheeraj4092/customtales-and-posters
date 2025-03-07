@@ -1,198 +1,206 @@
 
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { getProductById, getRelatedProducts } from '@/utils/data';
-import ProductCard from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/context/CartContext';
-import { ArrowLeft, Minus, Plus, ShoppingCart, Heart } from 'lucide-react';
+import { ShoppingCart, Heart, Share2, ArrowLeft } from 'lucide-react';
+import ProductCard from '@/components/ProductCard';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ageGroups } from '@/utils/productFormUtils';
 
-const ProductDetail: React.FC = () => {
+const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   
-  const product = id ? getProductById(id) : undefined;
-  const relatedProducts = id ? getRelatedProducts(id) : [];
+  if (!id) {
+    return <div>Product not found</div>;
+  }
   
-  // If product doesn't exist, redirect to products page
-  useEffect(() => {
-    if (!product && id) {
-      navigate('/products');
-    }
-  }, [product, id, navigate]);
+  const product = getProductById(id);
   
   if (!product) {
-    return null; // Will redirect in useEffect
+    return (
+      <div className="container-tight py-12 text-center">
+        <h2 className="text-2xl font-semibold mb-4">Product not found</h2>
+        <p className="mb-8">The product you're looking for doesn't exist or has been removed.</p>
+        <Link to="/products">
+          <Button>Browse Products</Button>
+        </Link>
+      </div>
+    );
   }
+  
+  const relatedProducts = getRelatedProducts(id);
   
   const handleAddToCart = () => {
     addItem(product.id, quantity);
   };
   
-  const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
-    }
-  };
-  
-  const increaseQuantity = () => {
-    setQuantity(quantity + 1);
-  };
-  
-  const formatPrice = (price: number) => {
-    return `$${price.toFixed(2)}`;
+  // Get age group labels for display
+  const getAgeGroupLabels = () => {
+    return product.age_groups.map(ageGroup => {
+      const groupInfo = ageGroups.find(group => group.id === ageGroup);
+      return groupInfo?.label || ageGroup;
+    });
   };
   
   return (
-    <div className="min-h-screen pt-24 pb-20">
-      <div className="container-tight">
-        {/* Breadcrumb Navigation */}
-        <div className="mb-6">
-          <Button
-            variant="ghost"
-            className="px-0 hover:bg-transparent"
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
+    <div className="container-tight py-12">
+      {/* Back button */}
+      <div className="mb-8">
+        <Link to="/products" className="inline-flex items-center text-primary hover:underline">
+          <ArrowLeft className="h-4 w-4 mr-2" /> Back to Products
+        </Link>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        {/* Product Image */}
+        <div className="rounded-xl overflow-hidden aspect-square">
+          <img 
+            src={product.images[0]} 
+            alt={product.title} 
+            className="w-full h-full object-cover"
+          />
         </div>
         
-        {/* Product Detail */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Image */}
-          <div className="rounded-2xl overflow-hidden bg-white shadow-subtle">
-            <img 
-              src={product.images[0]} 
-              alt={product.title} 
-              className="w-full h-auto object-cover aspect-square"
-            />
+        {/* Product Details */}
+        <div className="space-y-6">
+          <div>
+            <div className="flex justify-between items-start">
+              <h1 className="text-3xl font-display font-bold">{product.title}</h1>
+              <Button variant="ghost" size="icon">
+                <Heart className="h-5 w-5" />
+              </Button>
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <Badge variant="outline">{product.category.charAt(0).toUpperCase() + product.category.slice(1)}</Badge>
+              {product.featured && <Badge variant="secondary">Featured</Badge>}
+            </div>
+            <p className="text-2xl font-semibold mt-4">${product.price.toFixed(2)}</p>
           </div>
           
-          {/* Product Info */}
-          <div className="space-y-6">
+          <Separator />
+          
+          {/* Age Groups */}
+          <div>
+            <h3 className="text-sm font-medium mb-2">Age Groups:</h3>
+            <div className="flex flex-wrap gap-2">
+              {getAgeGroupLabels().map((label, index) => (
+                <Badge key={index} variant="outline">{label}</Badge>
+              ))}
+            </div>
+          </div>
+          
+          {/* Description */}
+          <div>
+            <h3 className="text-sm font-medium mb-2">Description:</h3>
+            <p className="text-muted-foreground">{product.description}</p>
+          </div>
+          
+          {/* Quantity and Add to Cart */}
+          <div className="space-y-4">
             <div>
-              <div className="flex items-center space-x-2 mb-2">
-                <span className="px-2 py-1 bg-accent text-accent-foreground text-xs font-medium rounded-full">
-                  {product.category === 'book' ? 'Book' : 
-                   product.category === 'poster' ? 'Poster' : 'Custom'}
-                </span>
-                {product.stock && product.stock > 0 ? (
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                    In Stock
-                  </span>
-                ) : (
-                  <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                    Out of Stock
-                  </span>
-                )}
+              <h3 className="text-sm font-medium mb-2">Quantity:</h3>
+              <div className="flex items-center">
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                >
+                  -
+                </Button>
+                <span className="mx-4 min-w-[2rem] text-center">{quantity}</span>
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => setQuantity(quantity + 1)}
+                >
+                  +
+                </Button>
               </div>
-              
-              <h1 className="text-3xl md:text-4xl font-display font-bold">{product.title}</h1>
-              
-              <p className="text-2xl font-medium mt-2">{formatPrice(product.price)}</p>
             </div>
             
-            <div>
-              <h3 className="font-medium mb-2">Description</h3>
-              <p className="text-muted-foreground">{product.description}</p>
-            </div>
+            <Button 
+              className="w-full" 
+              size="lg"
+              onClick={handleAddToCart}
+            >
+              <ShoppingCart className="h-4 w-4 mr-2" /> Add to Cart
+            </Button>
             
-            {product.ageGroups && product.ageGroups.length > 0 && (
-              <div>
-                <h3 className="font-medium mb-2">Age Group</h3>
+            <Button 
+              variant="outline" 
+              className="w-full"
+              size="lg"
+            >
+              <Share2 className="h-4 w-4 mr-2" /> Share
+            </Button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Product Details Tabs */}
+      <div className="mt-16">
+        <Tabs defaultValue="details">
+          <TabsList className="mb-4">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="shipping">Shipping</TabsTrigger>
+            <TabsTrigger value="returns">Returns</TabsTrigger>
+          </TabsList>
+          <TabsContent value="details" className="space-y-4">
+            <h3 className="text-lg font-semibold">Product Details</h3>
+            <p className="text-muted-foreground">{product.description}</p>
+            {product.tags && product.tags.length > 0 && (
+              <div className="mt-4">
+                <h4 className="font-medium mb-2">Tags</h4>
                 <div className="flex flex-wrap gap-2">
-                  {product.ageGroups.map((age) => (
-                    <span 
-                      key={age}
-                      className="px-3 py-1 bg-secondary text-secondary-foreground text-sm rounded-full"
-                    >
-                      {age === 'toddler' ? 'Toddler (0-2)' :
-                       age === 'preschool' ? 'Preschool (3-5)' :
-                       age === 'elementary' ? 'Elementary (6-10)' :
-                       age === 'middle' ? 'Middle School (11-13)' :
-                       age === 'teen' ? 'Teen (14-17)' : 'Adult (18+)'}
-                    </span>
+                  {product.tags.map((tag, index) => (
+                    <Badge key={index} variant="secondary">{tag}</Badge>
                   ))}
                 </div>
               </div>
             )}
-            
-            {/* Custom product note */}
-            {product.category === 'custom' && (
-              <div className="bg-accent/50 p-4 rounded-lg">
-                <p className="text-sm">
-                  This is a custom product. After purchase, our design team will contact you to collect images and details for your personalized creation.
-                </p>
-              </div>
-            )}
-            
-            {/* Quantity Selector */}
-            <div>
-              <h3 className="font-medium mb-2">Quantity</h3>
-              <div className="flex items-center space-x-3">
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  onClick={decreaseQuantity}
-                  disabled={quantity <= 1}
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <span className="w-8 text-center">{quantity}</span>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  onClick={increaseQuantity}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Button 
-                className="flex-1"
-                size="lg"
-                onClick={handleAddToCart}
-                disabled={!product.stock || product.stock <= 0}
-              >
-                <ShoppingCart className="mr-2 h-5 w-5" />
-                Add to Cart
-              </Button>
-              
-              <Button variant="outline" size="lg" className="sm:flex-none">
-                <Heart className="h-5 w-5" />
-              </Button>
-              
-              {product.category === 'custom' && (
-                <Link to="/custom-order" className="flex-1">
-                  <Button variant="outline" size="lg" className="w-full">
-                    Customize Now
-                  </Button>
-                </Link>
-              )}
-            </div>
+          </TabsContent>
+          <TabsContent value="shipping">
+            <h3 className="text-lg font-semibold mb-4">Shipping Information</h3>
+            <p className="text-muted-foreground">
+              We ship worldwide! Standard shipping takes 5-7 business days. Express shipping options are available at checkout.
+            </p>
+          </TabsContent>
+          <TabsContent value="returns">
+            <h3 className="text-lg font-semibold mb-4">Return Policy</h3>
+            <p className="text-muted-foreground">
+              If you're not completely satisfied with your purchase, you can return it within 30 days for a full refund.
+            </p>
+          </TabsContent>
+        </Tabs>
+      </div>
+      
+      {/* Related Products */}
+      {relatedProducts.length > 0 && (
+        <div className="mt-20">
+          <h2 className="text-2xl font-display font-bold mb-8">Related Products</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {relatedProducts.map(product => (
+              <ProductCard 
+                key={product.id}
+                id={product.id}
+                name={product.title}
+                price={product.price}
+                image={product.images[0]}
+                category={product.category}
+              />
+            ))}
           </div>
         </div>
-        
-        {/* Related Products */}
-        {relatedProducts.length > 0 && (
-          <div className="mt-20">
-            <h2 className="text-2xl font-display font-bold mb-8">You may also like</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {relatedProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };
 
-export default ProductDetail;
+export default ProductDetailPage;
