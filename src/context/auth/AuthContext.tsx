@@ -11,6 +11,7 @@ import {
   updateUserProfile
 } from './authService';
 import { AuthContextType, Profile } from './types';
+import { toast } from 'sonner';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -21,21 +22,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Debug logs to track auth state
+  useEffect(() => {
+    console.log('AuthContext state:', { 
+      userId: user?.id, 
+      profileId: profile?.id, 
+      isLoading 
+    });
+  }, [user, profile, isLoading]);
+
   useEffect(() => {
     // Set up the auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
-      setSession(session);
-      setUser(session?.user || null);
       
-      if (session?.user) {
-        const userProfile = await fetchProfile(session.user.id);
-        setProfile(userProfile);
-      } else {
-        setProfile(null);
+      try {
+        setSession(session);
+        setUser(session?.user || null);
+        
+        if (session?.user) {
+          const userProfile = await fetchProfile(session.user.id);
+          setProfile(userProfile);
+        } else {
+          setProfile(null);
+        }
+      } catch (error) {
+        console.error('Error handling auth state change:', error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     });
 
     // Get the initial session
@@ -69,19 +84,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
-      await signInWithEmail(email, password);
-      navigate('/');
+      const data = await signInWithEmail(email, password);
+      console.log('Sign in successful for:', email);
+      return data;
     } catch (error) {
-      console.error('Sign in error:', error);
+      console.error('Sign in error in context:', error);
+      throw error;
     }
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      await signUpWithEmail(email, password, fullName);
-      navigate('/auth'); // Return to login page
+      const data = await signUpWithEmail(email, password, fullName);
+      console.log('Sign up successful for:', email);
+      return data;
     } catch (error) {
-      console.error('Sign up error:', error);
+      console.error('Sign up error in context:', error);
+      throw error;
     }
   };
 
@@ -91,19 +110,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       navigate('/');
     } catch (error) {
       console.error('Sign out error:', error);
+      toast.error('Failed to sign out. Please try again.');
     }
   };
 
   const updateProfile = async (data: Partial<Profile>) => {
-    if (!user) return;
+    if (!user) {
+      toast.error('You must be logged in to update your profile');
+      return;
+    }
     
     try {
       const updatedProfile = await updateUserProfile(user.id, data);
       if (updatedProfile) {
         setProfile(updatedProfile);
+        toast.success('Profile updated successfully');
       }
     } catch (error) {
       console.error('Update profile error:', error);
+      toast.error('Failed to update profile. Please try again.');
     }
   };
 
